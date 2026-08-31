@@ -1,0 +1,116 @@
+spring:
+  application:
+    name: staynest-backend
+
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - vault://secret/staynest/dev/mysql?prefix=mysql.
+      - vault://secret/staynest/dev/redis?prefix=redis.
+      - vault://secret/staynest/dev/rabbitmq?prefix=rabbit.
+      - vault://secret/staynest/dev/encryption?prefix=encryption.
+      - vault://secret/staynest/dev/hashing?prefix=hashing.
+      - vault://secret/staynest/dev/jwt?prefix=jwt.
+
+  cloud:
+    vault:
+      uri: ${STAYNEST_HASHICORP_VAULT_URI}
+      authentication: ${STAYNEST_HASHICORP_VAULT_AUTHENTICATION}
+      app-role:
+        role-id: ${STAYNEST_HASHICORP_VAULT_ROLE_ID}
+        secret-id: ${STAYNEST_HASHICORP_VAULT_SECRET_ID}
+      kv:
+        enabled: true
+
+  rabbitmq:
+    host: ${rabbit.staynest-rabbitmq-host}
+    port: ${rabbit.staynest-rabbitmq-port}
+    username: ${rabbit.staynest-rabbitmq-username}
+    password: ${rabbit.staynest-rabbitmq-password}
+
+  datasource:
+    master:
+      jdbc-url: jdbc:mysql://${mysql.staynest-proxysql-url}
+      username: ${mysql.staynest-mysql-db-master-username}
+      password: ${mysql.staynest-mysql-db-master-password}
+      hikari:
+        maximum-pool-size: 10
+
+    replica:
+      jdbc-url: jdbc:mysql://${mysql.staynest-proxysql-url}
+      username: ${mysql.staynest-mysql-db-replica-username}
+      password: ${mysql.staynest-mysql-db-replica-password}
+      hikari:
+        maximum-pool-size: 10
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+
+redis:
+  master:
+    host: ${redis.redis-master-host}
+    port: ${redis.redis-master-port}
+    password: ${redis.redis-master-password}
+
+  replica:
+    host: ${redis.redis-replica-host}
+    port: ${redis.redis-replica-port}
+    password: ${redis.redis-replica-password}
+
+crypto:
+  encryption:
+    keys:
+      1: ${encryption.staynest-encryption-secret-key-v1}
+    active-version: 1
+    versions:
+      1:
+        active-key-id: 1
+        key-ids:
+          - 1
+
+  hashing:
+    keys:
+      1: ${hashing.staynest-hashing-secret-key-v1}
+    active-version: 1
+    versions:
+      1:
+        active-key-id: 1
+        key-ids:
+          - 1
+
+jwt:
+  issuer: ${jwt.staynest-jwt-issuer}
+
+  keys:
+    1:
+      private-key: ${jwt.staynest-jwt-private-key-v1}
+      public-key: ${jwt.staynest-jwt-public-key-v1}
+
+  active-version: 1
+  versions:
+    1:
+      active-key-id: 1
+      key-ids:
+        - 1
+
+
+#logging:
+#  level:
+#    org.springframework.vault: DEBUG
+#    org.springframework.cloud.vault: DEBUG
+    #
+#logging:
+#  level:
+#    org.springframework.security: DEBUG
+
+#server:
+ # tomcat:
+  #  accept-count: 10000
+   # threads:
+    #  max: 1000
