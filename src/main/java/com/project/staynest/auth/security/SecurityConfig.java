@@ -27,11 +27,13 @@ public class SecurityConfig {
         http.formLogin(AbstractHttpConfigurer::disable);
         http.httpBasic(Customizer.withDefaults());
 
-        http.csrf(csrf->
-                csrf.csrfTokenRepository(
-                        new CookieCsrfTokenRepository()
-                )
-        );
+        http.csrf(csrf -> csrf.disable());
+
+//        http.csrf(csrf->
+//                csrf.csrfTokenRepository(
+//                        new CookieCsrfTokenRepository()
+//                )
+//        );
 
         http.addFilterAfter(
                 refreshTokenFilter,
@@ -42,8 +44,10 @@ public class SecurityConfig {
                 auth ->
                         auth.requestMatchers(
                                 "/v1/auth/sign-up",
+                                        "/v1/auth/sign-up/verify-otp",
                                         "/v1/auth/email-login",
-                                        "/v1/auth/refresh"
+                                        "/v1/auth/refresh",
+                                        "/oauth/*"
                                 ).permitAll()
                                 .anyRequest().authenticated()
         );
